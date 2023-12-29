@@ -36,4 +36,5 @@ class PriorityQueue:  ## priority queue with 2 priority key
     def empty(self):
         if len(self.heap) == 0:
             return True
+        
         return False
