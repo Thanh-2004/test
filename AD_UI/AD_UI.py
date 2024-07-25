@@ -3,6 +3,7 @@ import time
 import random
 import collectData 
 import os
+import threading
 
 class ExperimentApp:
     def __init__(self, root):
@@ -58,7 +59,8 @@ class ExperimentApp:
         
         tk.Button(frame, text="Đăng nhập", command=self.create_intro_screen).pack(pady=10)
         
-        os.makedirs(f"Data/{self.name_var}")
+        if not os.path.exists(f"Data/{self.name_var}"):
+            os.makedirs(f"Data/{self.name_var}")
 
         self.logged = self.create_intro_screen
         self.current_frame = frame
@@ -115,15 +117,16 @@ class ExperimentApp:
         self.task1_timer = tk.StringVar()
         self.task1_timer.set("Thời gian: 0:05")
 
+        tk.Label(frame, textvariable=self.task1_timer).pack()
+
+        self.current_frame = frame
+
         current_time = self.task1_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
         path = f"Data/{self.name_var}/task1.txt"
-        collectData.collectData(path, time_rec, port)
-
-        tk.Label(frame, textvariable=self.task1_timer).pack()
-
-        self.current_frame = frame
+        data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
+        data_thread.start()
 
         self.root.after(1000, self.update_task1_timer)
 
@@ -173,7 +176,8 @@ class ExperimentApp:
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
         path = f"Data/{self.name_var}/task2.txt"
-        collectData.collectData(path, time_rec, port)
+        data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
+        data_thread.start()
 
         tk.Label(frame, textvariable=self.task2_timer).pack()
 
@@ -227,7 +231,8 @@ class ExperimentApp:
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
         path = f"Data/{self.name_var}/task3.txt"
-        collectData.collectData(path, time_rec, port)
+        data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
+        data_thread.start()
 
         tk.Label(frame, textvariable=self.task3_timer).pack()
 
@@ -287,7 +292,8 @@ class ExperimentApp:
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
         path = f"Data/{self.name_var}/task4.txt"
-        collectData.collectData(path, time_rec, port)
+        data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
+        data_thread.start()
 
         tk.Label(frame, textvariable=self.task4_timer).pack()
 
@@ -338,7 +344,8 @@ class ExperimentApp:
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
         path = f"Data/{self.name_var}/task5.txt"
-        collectData.collectData(path, time_rec, port)
+        data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
+        data_thread.start()
 
         tk.Label(frame, textvariable=self.task5_timer).pack()
 

@@ -23,3 +23,4 @@ def collectData(path, time_rec, port):
     print("DONE")
     s.close()
     file.close()
+    return 
