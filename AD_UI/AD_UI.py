@@ -40,7 +40,7 @@ class ExperimentApp:
         self.name_var = tk.StringVar()
         tk.Label(frame, text="Tên:").pack()
         tk.Entry(frame, textvariable=self.name_var).pack()
-        
+
         self.age_var = tk.StringVar()
         tk.Label(frame, text="Tuổi:").pack()
         tk.Entry(frame, textvariable=self.age_var).pack()
@@ -59,8 +59,8 @@ class ExperimentApp:
         
         tk.Button(frame, text="Đăng nhập", command=self.create_intro_screen).pack(pady=10)
         
-        if not os.path.exists(f"Data/{self.name_var}"):
-            os.makedirs(f"Data/{self.name_var}")
+        # if not os.path.exists(f"Data/{self.name_var.get()}"):
+        # os.makedirs(f"Data/{self.name_var.get()}", exist_ok=True)
 
         self.logged = self.create_intro_screen
         self.current_frame = frame
@@ -68,6 +68,8 @@ class ExperimentApp:
     def create_intro_screen(self):
         self.clear_frame()
         
+        print(self.name_var.get(), self.age_var.get())
+
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
 
@@ -124,7 +126,7 @@ class ExperimentApp:
         current_time = self.task1_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
-        path = f"Data/{self.name_var}/task1.txt"
+        path = f"Data/{self.name_var.get()}/task1.txt"
         data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
         data_thread.start()
 
@@ -170,12 +172,12 @@ class ExperimentApp:
         canvas.pack()
         
         self.task2_timer = tk.StringVar()
-        self.task2_timer.set("Thời gian: 0:05")
+        self.task2_timer.set("Thời gian: 2:00")
 
         current_time = self.task2_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
-        path = f"Data/{self.name_var}/task2.txt"
+        path = f"Data/{self.name_var.get()}/task2.txt"
         data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
         data_thread.start()
 
@@ -225,12 +227,12 @@ class ExperimentApp:
         canvas.pack()
         
         self.task3_timer = tk.StringVar()
-        self.task3_timer.set("Thời gian: 0:05")
+        self.task3_timer.set("Thời gian: 2:00")
 
         current_time = self.task3_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
-        path = f"Data/{self.name_var}/task3.txt"
+        path = f"Data/{self.name_var.get()}/task3.txt"
         data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
         data_thread.start()
 
@@ -286,12 +288,12 @@ class ExperimentApp:
         canvas.create_oval(center_x - radius, center_y - radius, center_x + radius, center_y + radius, fill="red")
         
         self.task4_timer = tk.StringVar()
-        self.task4_timer.set("Thời gian: 0:05")
+        self.task4_timer.set("Thời gian: 2:00")
 
         current_time = self.task4_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
-        path = f"Data/{self.name_var}/task4.txt"
+        path = f"Data/{self.name_var.get()}/task4.txt"
         data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
         data_thread.start()
 
@@ -338,12 +340,12 @@ class ExperimentApp:
         tk.Label(frame, text="Hiển thị màn hình trò chơi\n(Hiển thị hình ảnh sóng não thô theo thời gian thực)").pack(pady=20)
 
         self.task5_timer = tk.StringVar()
-        self.task5_timer.set("Thời gian: 0:10")
+        self.task5_timer.set("Thời gian: 2:00")
 
         current_time = self.task5_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
         time_rec = int(minutes * 60 + seconds)
-        path = f"Data/{self.name_var}/task5.txt"
+        path = f"Data/{self.name_var.get()}/task5.txt"
         data_thread = threading.Thread(target=collectData.collectData, args=(path, time_rec, port))
         data_thread.start()
 
@@ -471,7 +473,7 @@ class Arrow:
 
 
 if __name__ == "__main__":
-    port = "COM3"
+    port = "/dev/tty.usbmodem12301"
     root = tk.Tk()
     app = ExperimentApp(root)
     root.mainloop()
