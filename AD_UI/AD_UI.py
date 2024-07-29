@@ -360,8 +360,8 @@ class ExperimentApp:
         frame.pack(padx=20, pady=20)
 
         tk.Label(frame, text="Tác vụ 5 - Hướng dẫn").pack()
-        tk.Label(frame, text="Giới thiệu về tác vụ 5. Hướng dẫn người dùng thực hiện. Bấm phím Enter khi đã sẵn sàng.").pack(pady=20)
-        tk.Button(frame, text="Sẵn sàng", command=self.create_task5_execution).pack()
+        tk.Label(frame, text="Giới thiệu về tác vụ 5. Hướng dẫn người dùng thực hiện. Bấm phím [spacebar] khi đã sẵn sàng.").pack(pady=20)
+        # tk.Button(frame, text="Sẵn sàng", command=self.create_task5_execution).pack()
 
         self.current_frame = frame
         self.next_function = self.create_task5_execution
