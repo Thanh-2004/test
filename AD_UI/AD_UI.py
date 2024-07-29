@@ -4,6 +4,8 @@ import random
 import collectData 
 import os
 import threading
+import numpy as np
+import sounddevice as sd
 
 class ExperimentApp:
     def __init__(self, root):
@@ -11,11 +13,13 @@ class ExperimentApp:
 
         self.root.title("Thí nghiệm Sóng não")
         self.root.geometry("1200x800")
-        self.root.bind('<space>', self.on_spacebar_press)
+        # self.root.bind('<space>', self.on_spacebar_press)
         self.root.bind('<Return>', self.on_enter_press)
         
         self.current_frame = None
         
+        self.sound = Sound(frequency = 1000, duration = 0.4, fs = 44100)
+
         self.create_login_screen()
     
     def on_spacebar_press(self, event):
@@ -23,6 +27,9 @@ class ExperimentApp:
             # Gọi hàm tiếp theo dựa trên giao diện hiện tại
             if hasattr(self, 'next_function'):
                 self.next_function()
+                print("Spacebar pressed, moving to next function")
+        # self.root.unbind('<space>')
+        print("test")
 
     def on_enter_press(self, event):
         if self.current_frame:
@@ -67,6 +74,7 @@ class ExperimentApp:
 
     def create_intro_screen(self):
         self.clear_frame()
+        self.root.bind('<space>', self.on_spacebar_press)
         
         print(self.name_var.get(), self.age_var.get())
 
@@ -81,6 +89,7 @@ class ExperimentApp:
     
     def create_general_instructions(self):
         self.clear_frame()
+        self.root.unbind('<space>')
 
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
@@ -89,10 +98,13 @@ class ExperimentApp:
         tk.Label(frame, text="Trước khi bắt đầu, hãy đọc kỹ hướng dẫn sau đây. Bấm phím [spacebar] để tiếp tục.").pack(pady=20)
 
         self.next_function = self.create_task1_instructions
+        self.root.bind('<space>', self.on_spacebar_press)
+        print("test")
         self.current_frame = frame
     
     def create_task1_instructions(self):
         self.clear_frame()
+        self.root.unbind('<space>')
 
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
@@ -101,10 +113,13 @@ class ExperimentApp:
         tk.Label(frame, text="Giới thiệu về tác vụ 1. Hướng dẫn người dùng thực hiện. Bấm phím [spacebar] khi đã sẵn sàng.").pack(pady=20)
 
         self.next_function = self.create_task1_execution
+        self.root.bind('<space>', self.on_spacebar_press)
         self.current_frame = frame
 
     def create_task1_execution(self):
         self.clear_frame()
+        self.root.unbind('<space>')
+        self.sound.playSound()
 
 
         frame = tk.Frame(self.root)
@@ -142,12 +157,18 @@ class ExperimentApp:
         self.task1_timer.set(f"Thời gian: {minutes}:{seconds:02d}")
         if minutes == 0 and seconds == 0:
             tk.Label(self.current_frame, text="Đã kết thúc Tác vụ 1. \n Bấm phím [spacebar] để chuyển sang tác vụ tiếp theo.").pack(pady=30)
+            start = time.time()
+            self.sound.playSound()
+            end = time.time()
+            print(end - start)
             self.next_function = self.create_task2_instructions
+            self.root.bind('<space>', self.on_spacebar_press)
         else:
             self.root.after(1000, self.update_task1_timer)
 
     def create_task2_instructions(self):
         self.clear_frame()
+        self.root.unbind('<space>')
 
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
@@ -156,11 +177,14 @@ class ExperimentApp:
         tk.Label(frame, text="Giới thiệu về tác vụ 2. Hướng dẫn người dùng thực hiện. Bấm phím [spacebar] khi đã sẵn sàng.").pack(pady=20)
 
         self.next_function = self.create_task2_execution
-
+        self.root.bind('<space>', self.on_spacebar_press)
         self.current_frame = frame
 
     def create_task2_execution(self):
         self.clear_frame()
+        self.root.unbind('<space>')
+        self.sound.playSound()
+
 
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
@@ -172,7 +196,7 @@ class ExperimentApp:
         canvas.pack()
         
         self.task2_timer = tk.StringVar()
-        self.task2_timer.set("Thời gian: 2:00")
+        self.task2_timer.set("Thời gian: 0:05")
 
         current_time = self.task2_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
@@ -197,6 +221,8 @@ class ExperimentApp:
         self.task2_timer.set(f"Thời gian: {minutes}:{seconds:02d}")
         if minutes == 0 and seconds == 0:
             tk.Label(self.current_frame, text="Đã kết thúc Tác vụ 2. \n Bấm phím [spacebar] để chuyển sang tác vụ tiếp theo.").pack(pady=30)
+            self.sound.playSound()
+            self.root.bind('<space>', self.on_spacebar_press)
             self.next_function = self.create_task3_instructions
         else:
             self.root.after(1000, self.update_task2_timer)
@@ -211,11 +237,14 @@ class ExperimentApp:
         tk.Label(frame, text="Giới thiệu về tác vụ 3. Hướng dẫn người dùng thực hiện. Bấm phím [spacebar] khi đã sẵn sàng.").pack(pady=20)
 
         self.next_function = self.create_task3_execution
-
+        self.root.bind('<space>', self.on_spacebar_press)
         self.current_frame = frame
 
     def create_task3_execution(self):
         self.clear_frame()
+        self.root.unbind('<space>')
+        self.sound.playSound()
+
 
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
@@ -227,7 +256,7 @@ class ExperimentApp:
         canvas.pack()
         
         self.task3_timer = tk.StringVar()
-        self.task3_timer.set("Thời gian: 2:00")
+        self.task3_timer.set("Thời gian: 0:05")
 
         current_time = self.task3_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
@@ -252,6 +281,8 @@ class ExperimentApp:
         self.task3_timer.set(f"Thời gian: {minutes}:{seconds:02d}")
         if minutes == 0 and seconds == 0:
             tk.Label(self.current_frame, text="Đã kết thúc Tác vụ 3. \n Bấm phím [spacebar] để chuyển sang tác vụ tiếp theo.").pack(pady=30)
+            self.root.bind('<space>', self.on_spacebar_press)
+            self.sound.playSound()
             self.next_function = self.create_task4_instructions
         else:
             self.root.after(1000, self.update_task3_timer)
@@ -266,11 +297,14 @@ class ExperimentApp:
         tk.Label(frame, text="Giới thiệu về tác vụ 4. Hướng dẫn người dùng thực hiện. Bấm phím [spacebar] khi đã sẵn sàng.").pack(pady=20)
 
         self.next_function = self.create_task4_execution
-
+        self.root.bind('<space>', self.on_spacebar_press)
         self.current_frame = frame
 
     def create_task4_execution(self):
         self.clear_frame()
+        self.root.unbind('<space>')
+        self.sound.playSound()
+
 
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
@@ -288,7 +322,7 @@ class ExperimentApp:
         canvas.create_oval(center_x - radius, center_y - radius, center_x + radius, center_y + radius, fill="red")
         
         self.task4_timer = tk.StringVar()
-        self.task4_timer.set("Thời gian: 2:00")
+        self.task4_timer.set("Thời gian: 0:05")
 
         current_time = self.task4_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
@@ -313,6 +347,8 @@ class ExperimentApp:
         self.task4_timer.set(f"Thời gian: {minutes}:{seconds:02d}")
         if minutes == 0 and seconds == 0:
             tk.Label(self.current_frame, text="Đã kết thúc Tác vụ 4. \n Bấm phím [spacebar] để chuyển sang tác vụ tiếp theo.").pack(pady=30)
+            self.root.bind('<space>', self.on_spacebar_press)
+            self.sound.playSound()
             self.next_function = self.create_task5_instructions
         else:
             self.root.after(1000, self.update_task4_timer)
@@ -329,9 +365,13 @@ class ExperimentApp:
 
         self.current_frame = frame
         self.next_function = self.create_task5_execution
+        self.root.bind('<space>', self.on_spacebar_press)
 
     def create_task5_execution(self):
         self.clear_frame()
+        self.root.unbind('<space>')
+        self.sound.playSound()
+
 
         frame = tk.Frame(self.root)
         frame.pack(padx=20, pady=20)
@@ -340,7 +380,7 @@ class ExperimentApp:
         tk.Label(frame, text="Hiển thị màn hình trò chơi\n(Hiển thị hình ảnh sóng não thô theo thời gian thực)").pack(pady=20)
 
         self.task5_timer = tk.StringVar()
-        self.task5_timer.set("Thời gian: 2:00")
+        self.task5_timer.set("Thời gian: 0:05")
 
         current_time = self.task5_timer.get().split(": ")
         minutes, seconds = map(int, current_time[1].split(":"))
@@ -386,6 +426,8 @@ class ExperimentApp:
             self.show_results(reaction_time)
 
             tk.Label(self.current_frame, text="Đã kết thúc Tác vụ 5. \n Bấm phím [spacebar] để chuyển sang tác vụ tiếp theo.").pack(pady=30)
+            self.root.bind('<space>', self.on_spacebar_press)
+            self.sound.playSound()
             self.next_function = self.create_end_screen
 
         else:
@@ -471,6 +513,18 @@ class Arrow:
         self.canvas.create_text(200, 150, text=f"Tổng điểm của bạn là: {score}", font=("Helvetica", 16), fill="black")
         self.canvas.create_text(200, 200, text=f"Thời gian phản ứng trung bình của bạn là: {reaction_time:.2f} giây", font=("Helvetica", 16), fill="black")
 
+class Sound:
+    def __init__(self, frequency, duration, fs):
+        self.frequency = frequency
+        self.duration = duration
+        self.fs = fs
+    def createWave(self):
+        t = np.linspace(0, self.duration, int(self.fs * self.duration), endpoint=False)
+        self.wave = 0.5 * np.sin(2 * np.pi * self.frequency * t)
+    def playSound(self):
+        self.createWave()
+        sd.play(self.wave, self.fs)
+        sd.wait()
 
 if __name__ == "__main__":
     port = "/dev/tty.usbmodem12301"
