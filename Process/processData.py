@@ -209,7 +209,7 @@ def hjorth_parameters(y):
 
 
 def slide(subject_data):
-    print(subject_data.shape)
+    # print(subject_data.shape)
     # Khởi tạo biến
     x = 0
     y = []
@@ -217,7 +217,9 @@ def slide(subject_data):
     k = 15 * fs  # Độ dài của 1 cửa sổ trượt (sliding window)
 
 
-    feature_test = []
+    features = []
+    global NAMES
+    NAMES = None
     # Đọc và xử lý dữ liệu
     while x < (len(subject_data)):
         x += 1  # Tăng giá trị x
@@ -228,11 +230,17 @@ def slide(subject_data):
                 sliding_window = np.array(subject_data[
                                           sliding_window_start:sliding_window_end])  # Tạo mảng sliding_window tương ứng với cửa sổ trượt trong y
                 # sliding_window = filter(sliding_window)  # Áp dụng bộ lọc (nếu cần)
-                feature_test.append(FeatureExtract(
-                    sliding_window))  # Trích xuất đặc trưng và định hình lại để đưa vào mô hình
-    return feature_test
+                # feature_test.append(FeatureExtract(
+                #     sliding_window))  # Trích xuất đặc trưng và định hình lại để đưa vào mô hình
+                feature = FeatureExtract(sliding_window)
+                features.append(list(feature.values()))
 
-def loadAllData(folder_path):
+                if NAMES is None:
+                    NAMES = list(feature.keys())
+    
+    return features
+
+def processData(folder_path):
     print(os.listdir(folder_path))
     try:
         os.listdir(folder_path).remove(".DS_Store")
@@ -241,17 +249,46 @@ def loadAllData(folder_path):
 
     for index, dir in enumerate(os.listdir(folder_path)):
         subject_path = os.path.join(folder_path, dir)
+        print(subject_path)
         if index == 0:
             task1_data, task2_data, task3_data, task4_data, task5_data = loadSubjectData(subject_path)
+            X1 = slide(task1_data)
+            X2 = slide(task2_data)
+            X3 = slide(task3_data)
+            X4 = slide(task4_data)
+            X5 = slide(task5_data)
+
         else:
-            data = loadSubjectData(subject_path)
-            # task1_data = np.concatenate((task1_data, loadSubjectData(subject_path)[0]))
-            task2_data = np.concatenate((task2_data, data[1]))
-            # print(task2_data)
-            task3_data = np.concatenate((task3_data, data[2]))
-            task4_data = np.concatenate((task4_data, data[3]))
-            task5_data = np.concatenate((task5_data, data[4]))
-    return task1_data, task2_data, task3_data, task4_data, task5_data
+            task1_data, task2_data, task3_data, task4_data, task5_data = loadSubjectData(subject_path)
+            X1 += slide(task1_data)
+            X2 += slide(task2_data)
+            X3 += slide(task3_data)
+            X4 += slide(task4_data)
+            X5 += slide(task5_data)
+
+            # X2.append(slide(task2_data))
+            # X3.append(slide(task3_data))
+            # X4.append(slide(task4_data))
+            # X5.append(slide(task5_data))
+
+    X1 = np.array(X1)
+    X2 = np.array(X2)
+    X3 = np.array(X3)
+    X4 = np.array(X4)
+    X5 = np.array(X5)
+
+    return X1, X2, X3, X4, X5
+        
+
+        # else:
+        #     data = loadSubjectData(subject_path)
+        #     # task1_data = np.concatenate((task1_data, loadSubjectData(subject_path)[0]))
+        #     task2_data = np.concatenate((task2_data, data[1]))
+        #     # print(task2_data)
+        #     task3_data = np.concatenate((task3_data, data[2]))
+        #     task4_data = np.concatenate((task4_data, data[3]))
+        #     task5_data = np.concatenate((task5_data, data[4]))
+    # return task1_data, task2_data, task3_data, task4_data, task5_data
 
 def loadSubjectData(subject_path):
     task1_data = []
@@ -279,8 +316,10 @@ def loadSubjectData(subject_path):
                 task5_data.append(file_data)
             case _:
                 print("file name is not correct!")
-
-    # task1_data = np.concatenate(task1_data, axis = 0)
+    try:
+        task1_data = np.concatenate(task1_data, axis = 0)
+    except:
+        pass
     try:
         task2_data = np.concatenate(task2_data, axis = 0)
     except:
@@ -305,13 +344,7 @@ def loadSubjectData(subject_path):
     return task1_data, task2_data, task3_data, task4_data, task5_data
 
 def saveToCSV(data_path, csv_path):
-    task1_data, task2_data, task3_data, task4_data, task5_data = loadAllData(data_path)
-
-    # X1 = np.array(slide(('Data/Dat2/task1.txt')))
-    X2 = slide(task2_data)
-    X3 = slide(task3_data)
-    X4 = slide(task4_data)
-    X5 = slide(task5_data)
+    X1, X2, X3, X4, X5 = processData(data_path)
         
     # X = pd.DataFrame(X1)
     X = pd.DataFrame(X2)
@@ -328,7 +361,8 @@ def saveToCSV(data_path, csv_path):
                 pd.Series([4] * len(X5))])
     
     csv_file = pd.concat([X,y], axis=1)
-    csv_file.rename(columns = {0 : "label"}, inplace = True)
+    csv_file.columns = NAMES + ["label"]
+    # csv_file.rename(columns = {0 : "label"}, inplace = True)
     print(csv_file)
 
     # dir_name = os.path.dirname(csv_path)
@@ -342,4 +376,6 @@ if __name__ == "__main__":
     data_path = "Data"
     csv_path = "CSV"
     saveToCSV(data_path, csv_path)
+
+    # processData(data_path)
 
